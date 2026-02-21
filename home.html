@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Home - Dashboard</title>
+    <style>
+        body { font-family: sans-serif; padding: 40px; }
+        .dashboard { border: 1px solid #ccc; padding: 20px; border-radius: 8px; max-width: 400px; }
+        button { padding: 10px 15px; background-color: #e74c3c; color: white; border: none; cursor: pointer; border-radius: 4px; }
+    </style>
+</head>
+<body>
+
+    <div class="dashboard" id="dashboard" style="display: none;">
+        <h2>Welcome, <span id="displayUser"></span>!</h2>
+        <p><strong>Your Email:</strong> <span id="displayEmail"></span></p>
+        <button id="logoutBtn">Logout</button>
+    </div>
+
+    <script type="module">
+        import { getCurrentUser, logout } from './auth.js';
+
+        const user = getCurrentUser();
+
+        if (!user) {
+            alert("Access Denied! Please log in first.");
+            window.location.href = "Login.html";
+        } else {
+            document.getElementById('displayUser').textContent = user.username;
+            document.getElementById('displayEmail').textContent = user.email;
+            document.getElementById('dashboard').style.display = 'block';
+        }
+
+        document.getElementById('logoutBtn').addEventListener('click', logout);
+    </script>
+</body>
+</html>
