@@ -7,7 +7,7 @@ export async function loadProducts() {
     
     try {
         // Requirements: Filter by 1 category (ID 1 = Clothes)
-        const response = await fetch('https://api.escuelajs.co/api/v1/products/?categoryId=1');
+        const response = await fetch('https://api.escuelajs.co/api/v1/products/?categoryId=2');
         const data = await response.json();
         
         allProducts = data.slice(0, 25); // Min 25 products
@@ -58,46 +58,50 @@ function renderCart() {
             </div>
             <div>
                 <button onclick="updateQty(${item.id}, -1)">-</button>
+                <span>${item.quantity}</span>
                 <button onclick="updateQty(${item.id}, 1)">+</button>
+                <button onclick="removeFromCart(${item.id})" style="background:none; border:none; color:red; cursor:pointer; margin-left:10px;">Remove</button>
             </div>
         </div>
     `).join('');
     
-    const total = cart.reduce((acc, item) => acc + (item.price * item.quantity), 0);
-    document.getElementById('cart-total').innerText = total.toFixed(2);
+    calculateTotal(); // Auto-updates total 
+}
+
+// Add this function to shop.js
+export function removeFromCart(id) {
+    cart = cart.filter(item => item.id !== id);
+    renderCart();
 }
 
 export function handleCheckout() {
-    // Requirements: Get user data from localStorage
     const user = JSON.parse(localStorage.getItem('currentUser'));
-    const email = user ? user.email : "Guest";
-
-    if (cart.length === 0) return alert("Your cart is empty!");
+    if (!cart.length) return alert("Your cart is empty!");
 
     const status = document.getElementById('checkout-status');
-    status.innerHTML = "<span style='color: blue;'>Processing...</span>";
+    status.innerHTML = "<span style='color: blue;'>Loading...</span>"; // Loading state [cite: 54]
 
-    // Requirements: Create 1 nested object literal (payload)
+    // EXACT Payload Format from Requirement [cite: 61-67]
     const payload = {
-        userInfo: user,
-        cartItems: cart,
-        totalPrice: cart.reduce((acc, item) => acc + (item.price * item.quantity), 0)
+        user: user,             // user info [cite: 46]
+        cart: cart,             // cart items [cite: 48]
+        total: calculateTotal(), // total price [cite: 50]
+        date: new Date()        // date [cite: 67]
     };
 
-    // Requirements: setTimeout to simulate request
     setTimeout(() => {
         try {
-            // Requirements: Save to localStorage
+            // Save to localStorage [cite: 59, 110]
             localStorage.setItem('checkoutData', JSON.stringify(payload));
             
-            status.innerHTML = "<span style='color: green;'>Success! Order Placed.</span>";
+            status.innerHTML = "<span style='color: green;'>Success! Order Placed.</span>"; // Success message [cite: 55]
             console.log("Final Payload:", payload);
             cart = [];
             renderCart();
         } catch (e) {
-            status.innerHTML = "<span style='color: red;'>Error during checkout.</span>";
+            status.innerHTML = "<span style='color: red;'>Something went wrong.</span>"; // Fail message [cite: 57]
         }
-    }, 2000);
+    }, 2000); // Simulate request [cite: 51]
 }
 
 // Add event listener for filtering
@@ -112,3 +116,13 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 });
+
+// Add this to your shop.js to satisfy "Total cost is auto-update" [cite: 40, 98]
+export function calculateTotal() {
+    const total = cart.reduce((acc, item) => acc + (item.price * item.quantity), 0);
+    const totalSpan = document.getElementById('cart-total');
+    if (totalSpan) {
+        totalSpan.innerText = total.toFixed(2);
+    }
+    return total; // Returns as a number [cite: 66]
+}

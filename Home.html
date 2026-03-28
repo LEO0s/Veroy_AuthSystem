@@ -33,27 +33,37 @@
             <div id="checkout-status"></div>
         </aside>
     </div>
-
+    
     <script type="module">
-        import { getCurrentUser, logout } from './auth.js';
-        import { loadProducts, addToCart, updateQty, handleCheckout } from './shop.js';
+    import { getCurrentUser, logout } from './auth.js';
+    import { 
+        loadProducts, 
+        addToCart, 
+        updateQty, 
+        removeFromCart, // Added this import
+        handleCheckout 
+    } from './shop.js';
 
-        const user = getCurrentUser();
+    // 1. Security Check: Ensure user is logged in [cite: 42, 103]
+    const user = getCurrentUser();
 
-        if (!user) {
-            alert("Access Denied! Please log in first.");
-            window.location.href = "Login.html";
-        } else {
-            document.getElementById('displayUser').textContent = user.username;
-            loadProducts(); // Start loading API products
-        }
+    if (!user) {
+        alert("Access Denied! Please log in first.");
+        window.location.href = "Login.html";
+    } else {
+        document.getElementById('displayUser').textContent = user.username;
+        loadProducts(); // Load the min. 25 products from API [cite: 15, 78]
+    }
 
-        // Make functions globally available for the button onclicks
-        window.addToCart = addToCart;
-        window.updateQty = updateQty;
+    // 2. GLOBAL ACCESS: Attach functions to 'window' so HTML 'onclick' can see them
+    // This is required because 'type="module"' keeps functions private by default.
+    window.addToCart = addToCart;
+    window.updateQty = updateQty;
+    window.removeFromCart = removeFromCart; // Crucial for the Remove button [cite: 86]
 
-        document.getElementById('logoutBtn').addEventListener('click', logout);
-        document.getElementById('checkout-btn').addEventListener('click', handleCheckout);
+    // 3. Event Listeners for Static Buttons
+    document.getElementById('logoutBtn').addEventListener('click', logout);
+    document.getElementById('checkout-btn').addEventListener('click', handleCheckout);
     </script>
 </body>
 </html>

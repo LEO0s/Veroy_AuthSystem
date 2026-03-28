@@ -34,5 +34,6 @@ export function getCurrentUser() {
 
 export function logout() {
     localStorage.removeItem('currentUser');
-    window.location.href = "Login.html";
+    // Change this to index.html if you renamed your Signup page
+    window.location.href = "Login.html"; 
 }
