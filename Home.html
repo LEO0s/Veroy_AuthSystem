@@ -3,23 +3,40 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Home - Dashboard</title>
-    <style>
-        body { font-family: sans-serif; padding: 40px; }
-        .dashboard { border: 1px solid #ccc; padding: 20px; border-radius: 8px; max-width: 400px; }
-        button { padding: 10px 15px; background-color: #e74c3c; color: white; border: none; cursor: pointer; border-radius: 4px; }
-    </style>
+    <title>Shop - Midterm</title>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
-
-    <div class="dashboard" id="dashboard" style="display: none;">
-        <h2>Welcome, <span id="displayUser"></span>!</h2>
-        <p><strong>Your Email:</strong> <span id="displayEmail"></span></p>
+    <nav>
+        <div>
+            <h2>Welcome, <span id="displayUser"></span>!</h2>
+        </div>
         <button id="logoutBtn">Logout</button>
+    </nav>
+
+    <div class="filter-section">
+        <strong>Filter by Price: </strong>
+        <input type="number" id="minPrice" placeholder="Min $">
+        <input type="number" id="maxPrice" placeholder="Max $">
+        <button id="filterBtn">Apply Filter</button>
+    </div>
+
+    <div class="container">
+        <div id="product-grid"></div>
+
+        <aside id="cart-sidebar">
+            <h3>Your Cart</h3>
+            <div id="cart-items"></div>
+            <hr>
+            <p><strong>Total: $<span id="cart-total">0.00</span></strong></p>
+            <button id="checkout-btn">Checkout</button>
+            <div id="checkout-status"></div>
+        </aside>
     </div>
 
     <script type="module">
         import { getCurrentUser, logout } from './auth.js';
+        import { loadProducts, addToCart, updateQty, handleCheckout } from './shop.js';
 
         const user = getCurrentUser();
 
@@ -28,11 +45,15 @@
             window.location.href = "Login.html";
         } else {
             document.getElementById('displayUser').textContent = user.username;
-            document.getElementById('displayEmail').textContent = user.email;
-            document.getElementById('dashboard').style.display = 'block';
+            loadProducts(); // Start loading API products
         }
 
+        // Make functions globally available for the button onclicks
+        window.addToCart = addToCart;
+        window.updateQty = updateQty;
+
         document.getElementById('logoutBtn').addEventListener('click', logout);
+        document.getElementById('checkout-btn').addEventListener('click', handleCheckout);
     </script>
 </body>
 </html>
