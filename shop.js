@@ -1,16 +1,18 @@
+const currentUser = JSON.parse(localStorage.getItem('currentUser'));
+const cartKey = currentUser ? `cart_${currentUser.email}` : 'cart_guest';
+
 let allProducts = [];
-let cart = JSON.parse(localStorage.getItem('cart')) || [];
+let cart = JSON.parse(localStorage.getItem(cartKey)) || [];
 
 export async function loadProducts() {
     const grid = document.getElementById('product-grid');
     grid.innerHTML = "Loading products..."; 
     
     try {
-        // Requirements: Filter by 1 category (ID 1 = Clothes)
         const response = await fetch('https://api.escuelajs.co/api/v1/products/?categoryId=2');
         const data = await response.json();
         
-        allProducts = data.slice(0, 25); // Min 25 products
+        allProducts = data.slice(0, 25);
         displayProducts(allProducts);
     } catch (error) {
         grid.innerHTML = "Error loading products.";
@@ -49,16 +51,13 @@ export function updateQty(id, change) {
 }
 
 function renderCart() {
-    // 1. Persist the cart array to localStorage [cite: 110-111]
-    localStorage.setItem('cart', JSON.stringify(cart));
+    localStorage.setItem(cartKey, JSON.stringify(cart));
 
     const cartDiv = document.getElementById('cart-items');
     
-    // 2. Check if cart is empty to give user feedback [cite: 117]
     if (cart.length === 0) {
         cartDiv.innerHTML = '<p style="text-align:center; color:gray;">Your cart is empty.</p>';
     } else {
-        // 3. Render each item in the cart array [cite: 30, 83]
         cartDiv.innerHTML = cart.map(item => `
             <div class="cart-item">
                 <div>
@@ -79,11 +78,9 @@ function renderCart() {
         `).join('');
     }
     
-    // 4. Update the Total Price in the UI [cite: 40, 101]
     calculateTotal(); 
 }
 
-// Add this function to shop.js
 export function removeFromCart(id) {
     cart = cart.filter(item => item.id !== id);
     renderCart();
@@ -94,32 +91,30 @@ export function handleCheckout() {
     if (!cart.length) return alert("Your cart is empty!");
 
     const status = document.getElementById('checkout-status');
-    status.innerHTML = "<span style='color: blue;'>Loading...</span>"; // Loading state [cite: 54]
+    status.innerHTML = "<span style='color: blue;'>Loading...</span>"; 
 
-    // EXACT Payload Format from Requirement [cite: 61-67]
     const payload = {
-        user: user,             // user info [cite: 46]
-        cart: cart,             // cart items [cite: 48]
-        total: calculateTotal(), // total price [cite: 50]
-        date: new Date()        // date [cite: 67]
+        user: user,             
+        cart: cart,             
+        total: calculateTotal(),
+        date: new Date()        
     };
 
     setTimeout(() => {
         try {
-            // Save to localStorage [cite: 59, 110]
             localStorage.setItem('checkoutData', JSON.stringify(payload));
             
-            status.innerHTML = "<span style='color: green;'>Success! Order Placed.</span>"; // Success message [cite: 55]
+            status.innerHTML = "<span style='color: green;'>Success! Order Placed.</span>"; 
             console.log("Final Payload:", payload);
+            localStorage.removeItem(cartKey);
             cart = [];
             renderCart();
         } catch (e) {
-            status.innerHTML = "<span style='color: red;'>Something went wrong.</span>"; // Fail message [cite: 57]
+            status.innerHTML = "<span style='color: red;'>Something went wrong.</span>";
         }
-    }, 2000); // Simulate request [cite: 51]
+    }, 2000);
 }
 
-// Add event listener for filtering
 document.addEventListener('DOMContentLoaded', () => {
     const filterBtn = document.getElementById('filterBtn');
     if(filterBtn) {
@@ -132,17 +127,15 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 });
 
-// Add this to your shop.js to satisfy "Total cost is auto-update" [cite: 40, 98]
 export function calculateTotal() {
     const total = cart.reduce((acc, item) => acc + (item.price * item.quantity), 0);
     const totalSpan = document.getElementById('cart-total');
     if (totalSpan) {
         totalSpan.innerText = total.toFixed(2);
     }
-    return total; // Returns as a number [cite: 66]
+    return total;
 }
 
-// This ensures the UI reflects real-time state as soon as the page opens [cite: 96]
 document.addEventListener('DOMContentLoaded', () => {
     renderCart();
 });

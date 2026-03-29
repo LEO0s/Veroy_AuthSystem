@@ -40,11 +40,10 @@
         loadProducts, 
         addToCart, 
         updateQty, 
-        removeFromCart, // Added this import
+        removeFromCart,
         handleCheckout 
     } from './shop.js';
 
-    // 1. Security Check: Ensure user is logged in [cite: 42, 103]
     const user = getCurrentUser();
 
     if (!user) {
@@ -52,16 +51,13 @@
         window.location.href = "Login.html";
     } else {
         document.getElementById('displayUser').textContent = user.username;
-        loadProducts(); // Load the min. 25 products from API [cite: 15, 78]
+        loadProducts();
     }
 
-    // 2. GLOBAL ACCESS: Attach functions to 'window' so HTML 'onclick' can see them
-    // This is required because 'type="module"' keeps functions private by default.
     window.addToCart = addToCart;
     window.updateQty = updateQty;
-    window.removeFromCart = removeFromCart; // Crucial for the Remove button [cite: 86]
+    window.removeFromCart = removeFromCart;
 
-    // 3. Event Listeners for Static Buttons
     document.getElementById('logoutBtn').addEventListener('click', logout);
     document.getElementById('checkout-btn').addEventListener('click', handleCheckout);
     </script>

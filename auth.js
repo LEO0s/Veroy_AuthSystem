@@ -34,6 +34,6 @@ export function getCurrentUser() {
 
 export function logout() {
     localStorage.removeItem('currentUser');
-    // Change this to index.html if you renamed your Signup page
+    localStorage.removeItem('cart'); 
     window.location.href = "Login.html"; 
 }
