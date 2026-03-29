@@ -1,5 +1,5 @@
 let allProducts = [];
-let cart = [];
+let cart = JSON.parse(localStorage.getItem('cart')) || [];
 
 export async function loadProducts() {
     const grid = document.getElementById('product-grid');
@@ -49,23 +49,38 @@ export function updateQty(id, change) {
 }
 
 function renderCart() {
+    // 1. Persist the cart array to localStorage [cite: 110-111]
+    localStorage.setItem('cart', JSON.stringify(cart));
+
     const cartDiv = document.getElementById('cart-items');
-    cartDiv.innerHTML = cart.map(item => `
-        <div class="cart-item">
-            <div>
-                <strong>${item.name}</strong><br>
-                $${item.price} x ${item.quantity}
-            </div>
-            <div>
-                <button onclick="updateQty(${item.id}, -1)">-</button>
-                <span>${item.quantity}</span>
-                <button onclick="updateQty(${item.id}, 1)">+</button>
-                <button onclick="removeFromCart(${item.id})" style="background:none; border:none; color:red; cursor:pointer; margin-left:10px;">Remove</button>
-            </div>
-        </div>
-    `).join('');
     
-    calculateTotal(); // Auto-updates total 
+    // 2. Check if cart is empty to give user feedback [cite: 117]
+    if (cart.length === 0) {
+        cartDiv.innerHTML = '<p style="text-align:center; color:gray;">Your cart is empty.</p>';
+    } else {
+        // 3. Render each item in the cart array [cite: 30, 83]
+        cartDiv.innerHTML = cart.map(item => `
+            <div class="cart-item">
+                <div>
+                    <strong>${item.name}</strong><br>
+                    $${item.price.toFixed(2)} x ${item.quantity} 
+                </div>
+                <div>
+                    <button onclick="updateQty(${item.id}, -1)">-</button>
+                    <span>${item.quantity}</span>
+                    <button onclick="updateQty(${item.id}, 1)">+</button>
+                    
+                    <button onclick="removeFromCart(${item.id})" 
+                            style="background:none; border:none; color:red; cursor:pointer; margin-left:10px;">
+                        Remove
+                    </button>
+                </div>
+            </div>
+        `).join('');
+    }
+    
+    // 4. Update the Total Price in the UI [cite: 40, 101]
+    calculateTotal(); 
 }
 
 // Add this function to shop.js
@@ -126,3 +141,8 @@ export function calculateTotal() {
     }
     return total; // Returns as a number [cite: 66]
 }
+
+// This ensures the UI reflects real-time state as soon as the page opens [cite: 96]
+document.addEventListener('DOMContentLoaded', () => {
+    renderCart();
+});
