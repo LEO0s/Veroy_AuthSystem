@@ -9,7 +9,7 @@ export async function loadProducts() {
     grid.innerHTML = "Loading products..."; 
     
     try {
-        const response = await fetch('https://api.escuelajs.co/api/v1/products/?categoryId=2');
+        const response = await fetch('https://api.escuelajs.co/api/v1/products/?categoryId=30');
         const data = await response.json();
         
         allProducts = data.slice(0, 25);
