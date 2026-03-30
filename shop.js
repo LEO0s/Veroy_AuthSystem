@@ -23,7 +23,7 @@ function displayProducts(products) {
     const grid = document.getElementById('product-grid');
     grid.innerHTML = products.map(p => `
         <div class="card">
-            <img src="${p.images[0]}" alt="${p.title}" onerror="this.src='https://via.placeholder.com/150'">
+            <img src="${p.images[0]}" alt="${p.title}" onerror="this.src='https://via.placehold.co/150'">
             <h4>${p.title}</h4>
             <p>$${p.price}</p>
             <button onclick="addToCart(${p.id}, '${p.title.replace(/'/g, "")}', ${p.price})">Add to Cart</button>
