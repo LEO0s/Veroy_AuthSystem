@@ -117,12 +117,27 @@ export function handleCheckout() {
 
 document.addEventListener('DOMContentLoaded', () => {
     const filterBtn = document.getElementById('filterBtn');
-    if(filterBtn) {
+    const grid = document.getElementById('product-grid');
+
+    if (filterBtn) {
         filterBtn.addEventListener('click', () => {
-            const min = Number(document.getElementById('minPrice').value) || 0;
-            const max = Number(document.getElementById('maxPrice').value) || Infinity;
+            const minInput = document.getElementById('minPrice').value;
+            const maxInput = document.getElementById('maxPrice').value;
+
+            const min = minInput === "" ? 0 : Number(minInput);
+            const max = maxInput === "" ? Infinity : Number(maxInput);
+
             const filtered = allProducts.filter(p => p.price >= min && p.price <= max);
-            displayProducts(filtered);
+
+            if (filtered.length === 0) {
+                grid.innerHTML = `
+                    <div style="grid-column: 1 / -1; text-align: center; padding: 40px; width: 100%;">
+                        <h3 style="color: #555;">No items available in that price range.</h3>
+                        <button onclick="location.reload()" style="margin-top: 10px; cursor: pointer;">Clear Filters</button>
+                    </div>`;
+            } else {
+                displayProducts(filtered);
+            }
         });
     }
 });
